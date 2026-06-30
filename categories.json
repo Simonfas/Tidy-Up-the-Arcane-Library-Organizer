@@ -140,7 +140,11 @@
         "chimera",
         "kraken",
         "magical beast",
-        "magical animal"
+        "magical animal",
+        "monster physiology",
+        "dragon physiology",
+        "beast physiology",
+        "creature physiology"
       ]
     },
     {
@@ -254,7 +258,17 @@
         "humanization",
         "turn into",
         "body",
-        "form"
+        "form",
+        "therianthropy",
+        "therianthropic",
+        "werewolf",
+        "lycanthropy",
+        "shapeshifting",
+        "human-animal",
+        "beast-man",
+        "beast transformation",
+        "animal transformation",
+        "hybrid form"
       ]
     },
     {
@@ -375,7 +389,15 @@
         "disease",
         "sickness",
         "recovery",
-        "restore health"
+        "restore health",
+        "physiology",
+        "human physiology",
+        "body function",
+        "organs",
+        "tissues",
+        "cells",
+        "medical physiology",
+        "body systems"
       ]
     },
     {
