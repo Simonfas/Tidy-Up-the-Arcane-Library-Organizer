@@ -500,7 +500,10 @@
         "duel",
         "melee",
         "berserker",
-        "greatsword"
+        "greatsword",
+        "armor",
+        "muscle",
+        "steel"
       ]
     },
     {
