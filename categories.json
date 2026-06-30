@@ -1,6 +1,8 @@
 {
   "examples": [
     "C++",
+    "Mana Theory",
+    "Mana calculation",
     "Complete Guide to Stealth Magic",
     "Dragon",
     "Potion",
@@ -90,6 +92,27 @@
       "boost": 50,
       "words": [
         "book of spells"
+      ]
+    },
+    {
+      "targetShelf": "2D",
+      "boost": 45,
+      "words": [
+        "mana",
+        "mana theory",
+        "mana calculation",
+        "mana calculations",
+        "mana formula",
+        "mana formulas",
+        "mana cost",
+        "mana costs",
+        "mana efficiency",
+        "mana flow",
+        "mana control",
+        "mana output",
+        "mana consumption",
+        "magic power",
+        "magical power"
       ]
     }
   ],
@@ -517,7 +540,21 @@
         "formula",
         "formulas",
         "theorem",
-        "mana calculation"
+        "mana",
+        "mana theory",
+        "mana calculation",
+        "mana calculations",
+        "mana formula",
+        "mana formulas",
+        "mana cost",
+        "mana costs",
+        "mana efficiency",
+        "mana flow",
+        "mana control",
+        "mana output",
+        "mana consumption",
+        "magic power",
+        "magical power"
       ]
     },
     {
