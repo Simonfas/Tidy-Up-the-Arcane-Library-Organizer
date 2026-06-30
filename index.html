@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tidy Up the Arcane Library - Category Finder</title>
+
+  <style>
+    :root {
+      --bg: #130d18;
+      --card: #21162b;
+      --card-2: #2d1f3a;
+      --text: #f5edf9;
+      --muted: #c9b6d5;
+      --gold: #f5c76b;
+      --blue: #8fc7ff;
+      --red: #ff7b7b;
+      --green: #8dffbc;
+      --border: rgba(255, 255, 255, 0.12);
+      --shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(245, 199, 107, 0.15), transparent 35%),
+        linear-gradient(135deg, #110b16, #21162b 55%, #100b14);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .page {
+      width: min(1100px, 100%);
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    header {
+      text-align: center;
+      padding: 32px 0 20px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--gold);
+      background: rgba(245, 199, 107, 0.08);
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 5vw, 52px);
+      line-height: 1.05;
+      letter-spacing: -1px;
+    }
+
+    .subtitle {
+      margin: 16px auto 0;
+      max-width: 720px;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.5;
+    }
+
+    .search-card {
+      background: rgba(33, 22, 43, 0.88);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      border-radius: 24px;
+      padding: 20px;
+      margin-top: 22px;
+      backdrop-filter: blur(12px);
+    }
+
+    .search-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    input {
+      width: 100%;
+      padding: 16px 18px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: #130d18;
+      color: var(--text);
+      font-size: 17px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: rgba(245, 199, 107, 0.8);
+      box-shadow: 0 0 0 4px rgba(245, 199, 107, 0.12);
+    }
+
+    button {
+      border: 0;
+      padding: 0 20px;
+      border-radius: 16px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #f5c76b, #d99532);
+      color: #20130a;
+      font-weight: 800;
+      font-size: 15px;
+      white-space: nowrap;
+    }
+
+    button:hover {
+      filter: brightness(1.05);
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .chip {
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 14px;
+      user-select: none;
+    }
+
+    .chip:hover {
+      color: var(--text);
+      border-color: rgba(245, 199, 107, 0.6);
+    }
+
+    .results {
+      margin-top: 20px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .result-card {
+      background: linear-gradient(135deg, rgba(45, 31, 58, 0.95), rgba(33, 22, 43, 0.95));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .result-card.best {
+      border-color: rgba(245, 199, 107, 0.65);
+      box-shadow: 0 0 0 4px rgba(245, 199, 107, 0.08);
+    }
+
+    .result-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .shelf {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 54px;
+      height: 38px;
+      border-radius: 12px;
+      background: rgba(143, 199, 255, 0.12);
+      color: var(--blue);
+      font-weight: 900;
+      border: 1px solid rgba(143, 199, 255, 0.25);
+      margin-right: 10px;
+    }
+
+    .category-title {
+      display: flex;
+      align-items: center;
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+    .floor {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    .score {
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(141, 255, 188, 0.11);
+      color: var(--green);
+      border: 1px solid rgba(141, 255, 188, 0.24);
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .description {
+      color: var(--muted);
+      line-height: 1.55;
+      margin: 14px 0 0;
+    }
+
+    .matched {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .matched span {
+      font-size: 13px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      color: var(--gold);
+      background: rgba(245, 199, 107, 0.1);
+      border: 1px solid rgba(245, 199, 107, 0.24);
+    }
+
+    .empty {
+      margin-top: 20px;
+      background: rgba(255, 123, 123, 0.08);
+      border: 1px solid rgba(255, 123, 123, 0.25);
+      color: #ffd2d2;
+      padding: 18px;
+      border-radius: 18px;
+      line-height: 1.5;
+    }
+
+    .section-title {
+      margin: 34px 0 14px;
+      font-size: 24px;
+    }
+
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .mini-card {
+      background: rgba(33, 22, 43, 0.78);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 15px;
+      cursor: pointer;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .mini-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(245, 199, 107, 0.55);
+    }
+
+    .mini-title {
+      display: flex;
+      align-items: center;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .mini-description {
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 14px;
+    }
+
+    .hint {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .highlight {
+      color: var(--gold);
+      font-weight: 900;
+    }
+
+    .loading {
+      margin-top: 20px;
+      color: var(--muted);
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+    }
+
+    footer {
+      color: var(--muted);
+      text-align: center;
+      padding: 32px 0 14px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 720px) {
+      .page {
+        padding: 16px;
+      }
+
+      header {
+        padding-top: 20px;
+      }
+
+      .search-row {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+        padding: 15px;
+      }
+
+      .category-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .result-top {
+        flex-direction: column;
+      }
+
+      .score {
+        width: fit-content;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header>
+      <div class="badge">Arcane Library Helper</div>
+      <h1>Category Finder</h1>
+      <p class="subtitle">
+        Type a word or a book title from <span class="highlight">Tidy Up the Arcane Library</span>,
+        and this page will suggest the best shelf/category for the book.
+      </p>
+    </header>
+
+    <main>
+      <section class="search-card">
+        <div class="search-row">
+          <input
+            id="searchInput"
+            type="text"
+            placeholder="Search for example: C++, stealth, dragon, law, potion, language..."
+            autocomplete="off"
+          />
+          <button id="searchButton">Search</button>
+        </div>
+
+        <div class="chips" id="chips"></div>
+
+        <p class="hint">
+          Tip: A book about <b>C++</b> is not placed under “Languages” in this game.
+          It belongs to <b>2O - The Travels of Otherworld</b>, because it is technology from another world.
+        </p>
+
+        <div id="results" class="results">
+          <div class="loading">Loading categories...</div>
+        </div>
+      </section>
+
+      <h2 class="section-title">All categories</h2>
+      <div id="categoryGrid" class="category-grid"></div>
+    </main>
+
+    <footer>
+      Made as a quick helper for sorting books by words in their titles.
+    </footer>
+  </div>
+
+  <script>
+    let categories = [];
+    let examples = [];
+    let priorityRules = [];
+
+    const searchInput = document.getElementById("searchInput");
+    const searchButton = document.getElementById("searchButton");
+    const results = document.getElementById("results");
+    const chips = document.getElementById("chips");
+    const categoryGrid = document.getElementById("categoryGrid");
+
+    async function loadData() {
+      try {
+        const response = await fetch("categories.json");
+
+        if (!response.ok) {
+          throw new Error("Could not load categories.json");
+        }
+
+        const data = await response.json();
+
+        categories = data.categories || [];
+        examples = data.examples || [];
+        priorityRules = data.priorityRules || [];
+
+        renderChips();
+        renderCategoryGrid();
+        searchCategories();
+      } catch (error) {
+        results.innerHTML = `
+          <div class="empty">
+            Could not load <b>categories.json</b>.<br>
+            Make sure the file exists in the same folder as <b>index.html</b>,
+            and run the page through a local server.
+          </div>
+        `;
+
+        console.error(error);
+      }
+    }
+
+    function normalizeText(text) {
+      return String(text)
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim();
+    }
+
+    function getWords(text) {
+      return normalizeText(text)
+        .replace(/[^a-z0-9+#æøå\s-]/gi, " ")
+        .split(/\s+/)
+        .filter(Boolean);
+    }
+
+    function calculateScore(query, category) {
+      const normalizedQuery = normalizeText(query);
+      const queryWords = getWords(query);
+
+      let score = 0;
+      let matchedWords = [];
+
+      const searchableText = normalizeText([
+        category.shelf,
+        category.name,
+        category.floor,
+        category.description,
+        ...(category.keywords || [])
+      ].join(" "));
+
+      if (normalizedQuery.length === 0) {
+        return { score: 0, matchedWords: [] };
+      }
+
+      if (normalizeText(category.name).includes(normalizedQuery)) {
+        score += 35;
+        matchedWords.push(category.name);
+      }
+
+      for (const keyword of category.keywords || []) {
+        const normalizedKeyword = normalizeText(keyword);
+
+        if (normalizedQuery === normalizedKeyword) {
+          score += 40;
+          matchedWords.push(keyword);
+          continue;
+        }
+
+        if (normalizedQuery.includes(normalizedKeyword) && normalizedKeyword.length >= 3) {
+          score += 22;
+          matchedWords.push(keyword);
+          continue;
+        }
+
+        if (normalizedKeyword.includes(normalizedQuery) && normalizedQuery.length >= 3) {
+          score += 16;
+          matchedWords.push(keyword);
+          continue;
+        }
+
+        for (const word of queryWords) {
+          if (word.length < 2) continue;
+
+          if (normalizedKeyword === word) {
+            score += 12;
+            matchedWords.push(keyword);
+          } else if (normalizedKeyword.includes(word) && word.length >= 4) {
+            score += 7;
+            matchedWords.push(keyword);
+          }
+        }
+      }
+
+      for (const word of queryWords) {
+        if (word.length < 3) continue;
+
+        if (searchableText.includes(word)) {
+          score += 3;
+        }
+      }
+
+      const priorityBoost = calculatePriorityBoost(normalizedQuery, category);
+      score += priorityBoost.score;
+      matchedWords.push(...priorityBoost.matchedWords);
+
+      matchedWords = [...new Set(matchedWords)].slice(0, 8);
+
+      return { score, matchedWords };
+    }
+
+    function calculatePriorityBoost(normalizedQuery, category) {
+      let score = 0;
+      let matchedWords = [];
+
+      for (const rule of priorityRules) {
+        if (rule.targetShelf !== category.shelf) continue;
+
+        const words = rule.words || [];
+        const requiredWords = rule.requiredWords || [];
+
+        const hasRequiredWords = requiredWords.every(word => {
+          return normalizedQuery.includes(normalizeText(word));
+        });
+
+        if (requiredWords.length > 0 && !hasRequiredWords) {
+          continue;
+        }
+
+        for (const word of words) {
+          const normalizedWord = normalizeText(word);
+
+          if (normalizedWord.length < 2) continue;
+
+          if (normalizedQuery.includes(normalizedWord)) {
+            score += rule.boost || 0;
+            matchedWords.push(word);
+          }
+        }
+      }
+
+      return { score, matchedWords };
+    }
+
+    function searchCategories() {
+      const query = searchInput.value.trim();
+
+      if (!query) {
+        results.innerHTML = `
+          <div class="empty">
+            Type a word or a book title in the search field.
+            Try for example <b>C++</b>, <b>stealth</b>, <b>dragon</b>,
+            <b>potion</b> or <b>law</b>.
+          </div>
+        `;
+        return;
+      }
+
+      const scored = categories
+        .map(category => {
+          const result = calculateScore(query, category);
+
+          return {
+            ...category,
+            score: result.score,
+            matchedWords: result.matchedWords
+          };
+        })
+        .filter(category => category.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 5);
+
+      if (scored.length === 0) {
+        results.innerHTML = `
+          <div class="empty">
+            I could not find a safe category for <b>${escapeHtml(query)}</b>.
+            Try another word from the book title, such as “dragon”, “magic”,
+            “law”, “potion”, “language”, “dungeon” or “stealth”.
+          </div>
+        `;
+        return;
+      }
+
+      results.innerHTML = scored.map((category, index) => {
+        const percent = Math.min(99, Math.max(35, Math.round(category.score)));
+
+        return `
+          <article class="result-card ${index === 0 ? "best" : ""}">
+            <div class="result-top">
+              <div>
+                <div class="category-title">
+                  <span class="shelf">${escapeHtml(category.shelf)}</span>
+                  ${escapeHtml(category.name)}
+                </div>
+                <div class="floor">${escapeHtml(category.floor)}</div>
+              </div>
+              <div class="score">
+                ${index === 0 ? "Best guess" : "Possible match"} · ${percent}%
+              </div>
+            </div>
+
+            <p class="description">${escapeHtml(category.description)}</p>
+
+            ${
+              category.matchedWords.length > 0
+                ? `<div class="matched">
+                    ${category.matchedWords.map(word => `<span>${escapeHtml(word)}</span>`).join("")}
+                  </div>`
+                : ""
+            }
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderChips() {
+      chips.innerHTML = examples.map(example => {
+        return `<span class="chip" data-example="${escapeHtml(example)}">${escapeHtml(example)}</span>`;
+      }).join("");
+
+      document.querySelectorAll(".chip").forEach(chip => {
+        chip.addEventListener("click", () => {
+          searchInput.value = chip.dataset.example;
+          searchCategories();
+          searchInput.focus();
+        });
+      });
+    }
+
+    function renderCategoryGrid() {
+      categoryGrid.innerHTML = categories.map(category => {
+        return `
+          <article class="mini-card" data-category="${escapeHtml(category.name)}">
+            <div class="mini-title">
+              <span class="shelf">${escapeHtml(category.shelf)}</span>
+              ${escapeHtml(category.name)}
+            </div>
+            <div class="mini-description">
+              ${escapeHtml(category.description)}
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      document.querySelectorAll(".mini-card").forEach(card => {
+        card.addEventListener("click", () => {
+          searchInput.value = card.dataset.category;
+          searchCategories();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+      });
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    searchButton.addEventListener("click", searchCategories);
+
+    searchInput.addEventListener("input", searchCategories);
+
+    searchInput.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        searchCategories();
+      }
+    });
+
+    loadData();
+  </script>
+</body>
+</html>
